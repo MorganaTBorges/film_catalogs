@@ -5,8 +5,9 @@ class FilmCatalogsController < ApplicationController
     csv_text = File.read(params[:file].path)
     csv = CSV.parse(csv_text, headers: true)
 
-    csv.each do |row|
-      FilmCatalog.create!(film_catalog_params(row.to_h))
+    films = csv.map do |row|
+      FilmCatalog.find_or_create_by(film_params(row))
+      #FilmCatalog.create!(film_params(row))
     end
 
     render json: { message: "CSV importado com sucesso!" }, status: :ok
@@ -19,14 +20,13 @@ class FilmCatalogsController < ApplicationController
 
   private
 
-  def filters
-    params.permit(:show_id, :type, :title, :director, :cast, :country, :date_added, :release_year, :rating, :duration, :listed_in, :description)
+  def film_params(row)
+    row.to_hash.slice('show_id', 'type', 'title', 'director', 'cast', 'country',
+                      'date_added', 'release_year', 'duration', 'listed_in', 'description')
   end
 
-  def film_catalog_params(row_params)
-    row_params.slice(:show_id, :type, :title, :director, :cast, :country,
-                      :date_added, :release_year, :rating, :duration, :listed_in,
-                      :description)
-              .transform_keys { |key| key.to_s.underscore.to_sym }
+  def filters
+    params.permit(:show_id, :type, :title, :director, :cast, :country, :date_added, :release_year,
+                  :duration, :listed_in, :description)
   end
 end
