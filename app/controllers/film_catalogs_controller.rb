@@ -2,15 +2,18 @@ class FilmCatalogsController < ApplicationController
   require 'csv'
 
   def create
-    csv_text = File.read(params[:file].path)
-    csv = CSV.parse(csv_text, headers: true)
+    if params[:file].present?
+      csv_text = File.read(params[:file].path)
+      csv = CSV.parse(csv_text, headers: true)
 
-    films = csv.map do |row|
-      FilmCatalog.find_or_create_by(film_params(row))
-      #FilmCatalog.create!(film_params(row))
+      films = csv.map do |row|
+        FilmCatalog.find_or_create_by(film_params(row))
+      end
+
+      render json: { message: "CSV importado com sucesso!" }, status: :ok
+    else
+      render json: { message: "Arquivo CSV não fornecido"}, status: :unprocessable_entity
     end
-
-    render json: { message: "CSV importado com sucesso!" }, status: :ok
   end
 
   def index
