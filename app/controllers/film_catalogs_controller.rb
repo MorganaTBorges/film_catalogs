@@ -10,9 +10,9 @@ class FilmCatalogsController < ApplicationController
         FilmCatalog.find_or_create_by(film_params(row))
       end
 
-      render json: { message: "CSV importado com sucesso!" }, status: :ok
+      render json: { message: "CSV imported successfully!" }, status: :ok
     else
-      render json: { message: "Arquivo CSV não fornecido"}, status: :unprocessable_entity
+      render json: { message: "CSV file not provided"}, status: :unprocessable_entity
     end
   end
 
